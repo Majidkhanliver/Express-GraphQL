@@ -77,6 +77,28 @@ module.exports = {
     //   error.code = 401;
     //   throw error;
     // }
-    return { posts: posts, totalPosts :posts.length};
+    if (!page) {
+      page = 1;
+    }
+    const perPage = 2;
+    const newPosts = posts.slice((page-1)*perPage,page*perPage)
+    return { posts: newPosts, totalPosts: posts.length };
+  },
+  updatePost: async function({ id, post },req) {
+       if (!req.isAuth) {
+         const error = new Error("Not authenticated");
+         error.code = 401;
+         throw error;
+    }
+    const foundPost = post.filter(p => p.id == id);
+    if (foundPost.length == 0) {
+      const error = new Error("No Post Found");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+    const otherPosts = post.filter(p => p.id != id)
+    otherPosts.push(post);
+    post = otherPosts
   }
 };
